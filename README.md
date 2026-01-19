@@ -129,7 +129,7 @@ This add-on requires an Experiment API to access Thunderbird's internal calendar
 
 ```bash
 # Clone repository
-git clone https://github.com/akirschten/calendar-auto-categories.git
+git clone https://github.com/ces-repo/calendar-auto-categories.git
 cd calendar-auto-categories
 
 # Create XPI
