@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Calendar Auto Categories - Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📅 Calendar Auto Categories</h1>
+      <p class="subtitle">Automatically assign categories based on keywords in event titles</p>
+    </header>
+
+    <!-- Categories Section -->
+    <section class="card">
+      <h2>Categories</h2>
+      <p class="description">Define keywords and their category colors. The keyword is searched in event titles (case-insensitive).</p>
+      
+      <div id="categories-list" class="categories-list">
+        <!-- Filled by JavaScript -->
+      </div>
+
+      <div class="add-category">
+        <input type="text" id="new-keyword" placeholder="Keyword (e.g. Delivery)">
+        <input type="color" id="new-color" value="#4a90d9">
+        <button id="add-category" class="btn btn-primary">+ Add</button>
+      </div>
+    </section>
+
+    <!-- Time Range Section -->
+    <section class="card">
+      <h2>Time Range</h2>
+      <p class="description">Define how far back and forward to scan for events.</p>
+      
+      <div class="settings-grid">
+        <div class="setting">
+          <label for="days-back">Days in the past</label>
+          <input type="number" id="days-back" min="0" max="365" value="1">
+        </div>
+        <div class="setting">
+          <label for="days-forward">Days in the future</label>
+          <input type="number" id="days-forward" min="1" max="365" value="90">
+        </div>
+      </div>
+    </section>
+
+    <!-- Interval Section -->
+    <section class="card">
+      <h2>Scan Interval</h2>
+      <p class="description">How often to check for new or changed events.</p>
+      
+      <div class="settings-grid">
+        <div class="setting">
+          <label for="interval">Interval (minutes)</label>
+          <input type="number" id="interval" min="0" max="1440" value="10">
+          <span class="hint">Set to 0 to only scan at startup</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Appearance Section -->
+    <section class="card">
+      <h2>Appearance</h2>
+      <p class="description">Customize how categories are displayed in the calendar.</p>
+      
+      <div class="setting checkbox-setting">
+        <label class="checkbox-label">
+          <input type="checkbox" id="full-width-colors" checked>
+          <span>Full-width category colors</span>
+        </label>
+        <span class="hint">Show category colors as full event background instead of small bar</span>
+      </div>
+    </section>
+
+    <!-- Actions Section -->
+    <section class="card">
+      <h2>Actions</h2>
+      
+      <div class="actions">
+        <button id="scan-now" class="btn btn-secondary">🔍 Scan Now</button>
+        <button id="force-scan" class="btn btn-secondary">🔄 Force Re-Scan</button>
+        <button id="reset-categories" class="btn btn-secondary btn-danger">🗑️ Reset Categories</button>
+        <button id="export-config" class="btn btn-secondary">📤 Export</button>
+        <button id="import-config" class="btn btn-secondary">📥 Import</button>
+        <input type="file" id="import-file" accept=".json" style="display: none;">
+      </div>
+      
+      <div id="status" class="status"></div>
+    </section>
+
+    <!-- Save Button -->
+    <div class="save-bar">
+      <span id="save-status"></span>
+      <button id="save" class="btn btn-primary btn-large">💾 Save Settings</button>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

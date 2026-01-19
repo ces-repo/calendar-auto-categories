@@ -1,0 +1,105 @@
+[
+  {
+    "namespace": "calendarCategories",
+    "description": "API for automatically categorizing calendar events based on keywords",
+    "functions": [
+      {
+        "name": "ensureCategories",
+        "type": "function",
+        "async": true,
+        "description": "Creates categories with colors if they don't exist",
+        "parameters": [
+          {
+            "name": "categoryColors",
+            "type": "object",
+            "description": "Object mapping category names to hex color codes",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      {
+        "name": "applyCategories",
+        "type": "function",
+        "async": true,
+        "description": "Scans calendar events and applies categories based on keyword rules",
+        "parameters": [
+          {
+            "name": "rules",
+            "type": "array",
+            "description": "Array of keyword-to-category mapping rules",
+            "items": {
+              "type": "object",
+              "properties": {
+                "keyword": {
+                  "type": "string",
+                  "description": "Keyword to search for in event title (case-insensitive)"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "Category name to assign"
+                }
+              },
+              "required": ["keyword", "category"]
+            }
+          },
+          {
+            "name": "daysBack",
+            "type": "integer",
+            "description": "Number of days in the past to scan",
+            "default": 1
+          },
+          {
+            "name": "daysForward",
+            "type": "integer",
+            "description": "Number of days in the future to scan",
+            "default": 90
+          },
+          {
+            "name": "force",
+            "type": "boolean",
+            "description": "Force re-apply categories even if already set",
+            "default": false
+          }
+        ]
+      },
+      {
+        "name": "getStats",
+        "type": "function",
+        "async": true,
+        "description": "Returns statistics from the last categorization run",
+        "parameters": []
+      },
+      {
+        "name": "removeCategories",
+        "type": "function",
+        "async": true,
+        "description": "Removes categories created by this add-on",
+        "parameters": [
+          {
+            "name": "categoryNames",
+            "type": "array",
+            "description": "Array of category names to remove",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      {
+        "name": "injectCalendarStyles",
+        "type": "function",
+        "async": true,
+        "description": "Injects CSS to show full category colors in calendar view",
+        "parameters": [
+          {
+            "name": "enabled",
+            "type": "boolean",
+            "description": "Whether to enable full-width category colors"
+          }
+        ]
+      }
+    ]
+  }
+]

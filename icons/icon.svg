@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Calendar base -->
+  <rect x="4" y="8" width="40" height="36" rx="4" fill="#ffffff" stroke="#333333" stroke-width="2"/>
+  
+  <!-- Calendar header -->
+  <rect x="4" y="8" width="40" height="10" rx="4" fill="#4a90d9"/>
+  <rect x="4" y="14" width="40" height="4" fill="#4a90d9"/>
+  
+  <!-- Calendar rings -->
+  <rect x="12" y="4" width="4" height="10" rx="2" fill="#333333"/>
+  <rect x="32" y="4" width="4" height="10" rx="2" fill="#333333"/>
+  
+  <!-- Color dots representing categories -->
+  <circle cx="14" cy="26" r="4" fill="#8B0000"/>
+  <circle cx="26" cy="26" r="4" fill="#FF0000"/>
+  <circle cx="38" cy="26" r="4" fill="#FFD700"/>
+  
+  <circle cx="14" cy="38" r="4" fill="#800080"/>
+  <circle cx="26" cy="38" r="4" fill="#0000FF"/>
+  <circle cx="38" cy="38" r="4" fill="#228B22"/>
+</svg>
