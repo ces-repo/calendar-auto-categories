@@ -8,17 +8,16 @@
 // Default configuration (used if no settings saved yet)
 const DEFAULT_CONFIG = {
   categories: {
-    "Auslieferung": "#8B0000",
-    "Abholung":     "#FF0000",
-    "Rückgabe":     "#FFD700",
-    "Rücknahme":    "#FFFF00",
-    "Ferien":       "#800080",
-    "Linth":        "#0000FF",
+    "Meeting":   "#4A90D9",
+    "Deadline":  "#DC3545",
+    "Urlaub":    "#28A745",
+    "Wichtig":   "#FF8C00",
+    "Privat":    "#6F42C1",
   },
   daysBack: 1,
   daysForward: 90,
   intervalMinutes: 10,
-  fullWidthColors: true,  // Show category colors as full background
+  fullWidthColors: true,
 };
 
 // Current configuration
