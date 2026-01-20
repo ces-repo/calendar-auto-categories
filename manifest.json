@@ -2,13 +2,14 @@
   "manifest_version": 2,
   "name": "Calendar Auto Categories",
   "description": "Automatically assigns categories to calendar events based on keywords in the title. Supports custom colors and configurable time ranges.",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "author": "C|E|S Catering & Event Services",
-  "homepage_url": "https://github.com/akirschten/calendar-auto-categories",
+  "homepage_url": "https://github.com/ces-repo/calendar-auto-categories",
   "browser_specific_settings": {
     "gecko": {
       "id": "calendar-auto-categories@ces-catering.ch",
-      "strict_min_version": "115.0"
+      "strict_min_version": "115.0",
+      "strict_max_version": "160.*"
     }
   },
   "icons": {
