@@ -20,7 +20,6 @@ A Thunderbird add-on that automatically assigns categories (with colors) to cale
 |----------|---------------|
 | ![Settings](docs/screenshot-settings.png) | ![Calendar](docs/screenshot-calendar.png) |
 
-*Add your own screenshots to a `docs/` folder*
 
 ## 📦 Installation
 
