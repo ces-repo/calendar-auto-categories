@@ -85,12 +85,15 @@ async function saveConfig() {
  */
 function renderCategories() {
   const list = elements.categoriesList;
-  list.innerHTML = "";
-  
+  list.replaceChildren();
+
   const keywords = Object.keys(config.categories);
-  
+
   if (keywords.length === 0) {
-    list.innerHTML = '<div class="empty-state">No categories defined. Add one below!</div>';
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.textContent = "No categories defined. Add one below!";
+    list.appendChild(empty);
     return;
   }
   
@@ -197,7 +200,8 @@ async function scanNow(force = false) {
     
     if (result && result.stats) {
       showStatus(
-        `Scan complete: ${result.stats.processed} events checked, ${result.stats.modified} categorized`,
+        `Scan complete: ${result.stats.processed} events checked, ${result.stats.modified} categorized` +
+          (result.stats.conflicts ? `, ${result.stats.conflicts} skipped (changed on server, retried next scan)` : ""),
         "success"
       );
     } else {

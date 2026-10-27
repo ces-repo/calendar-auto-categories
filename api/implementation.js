@@ -75,9 +75,69 @@ function encodeCategoryName(name) {
 let lastStats = {
   processed: 0,
   modified: 0,
+  conflicts: 0,
   lastRun: null,
   details: []
 };
+
+/**
+ * Conflict guard
+ *
+ * When several computers share a CalDAV calendar, an event may already have
+ * been changed on the server (e.g. another computer added the category) by the
+ * time this add-on saves it. Thunderbird then shows the "item was modified on
+ * the server" dialog. For writes made by this add-on we instead keep the
+ * server version silently (same as "discard local changes and reload"); the
+ * next scan re-checks the event and adds the category if it is still missing.
+ * Edits made by the user still get the normal dialog.
+ */
+const pendingAutoWrites = new Set();
+const guardedCalendars = new Set();
+
+function getDavCalendar(calendar) {
+  let target = calendar.wrappedJSObject || calendar;
+  if (target.mUncachedCalendar) {
+    target = target.mUncachedCalendar.wrappedJSObject || target.mUncachedCalendar;
+  }
+  if (typeof target.promptOverwrite != "function" || typeof target.getUpdatedItem != "function") {
+    return null;
+  }
+  return target;
+}
+
+function installConflictGuard(calendar) {
+  const dav = getDavCalendar(calendar);
+  if (!dav || guardedCalendars.has(dav)) return;
+
+  const current = dav.promptOverwrite;
+  const original = current.cacOriginal || current;
+  const guard = function(method, item, listener, oldItem) {
+    if (item && pendingAutoWrites.has(item.id)) {
+      console.log(`Calendar Auto Categories: "${item.title}" was changed on the server, keeping server version`);
+      lastStats.conflicts++;
+      this.getUpdatedItem(item, listener);
+      return;
+    }
+    return original.apply(this, arguments);
+  };
+  guard.cacOriginal = original;
+  dav.promptOverwrite = guard;
+  guardedCalendars.add(dav);
+}
+
+function removeConflictGuards() {
+  for (const dav of guardedCalendars) {
+    const original = dav.promptOverwrite.cacOriginal;
+    if (original) {
+      delete dav.promptOverwrite;
+      if (dav.promptOverwrite !== original) {
+        dav.promptOverwrite = original;
+      }
+    }
+  }
+  guardedCalendars.clear();
+  pendingAutoWrites.clear();
+}
 
 /**
  * Inject CSS into a document
@@ -177,6 +237,9 @@ var calendarCategories = class extends ExtensionCommon.ExtensionAPI {
     
     // Remove injected styles
     removeStylesFromAllWindows();
+
+    // Restore Thunderbird's own conflict handling
+    removeConflictGuards();
     
     Services.obs.notifyObservers(null, "startupcache-invalidate");
   }
@@ -289,14 +352,14 @@ var calendarCategories = class extends ExtensionCommon.ExtensionAPI {
           lastStats = {
             processed: 0,
             modified: 0,
+            conflicts: 0,
             lastRun: new Date().toISOString(),
             details: []
           };
           
           try {
-            const calManager = Cc["@mozilla.org/calendar/manager;1"]
-              .getService(Ci.calICalendarManager);
-            
+            const calManager = cal.manager;
+
             const calendars = calManager.getCalendars();
             console.log(`  Found ${calendars.length} calendar(s)`);
             
@@ -326,6 +389,8 @@ var calendarCategories = class extends ExtensionCommon.ExtensionAPI {
               }
               
               console.log(`  Calendar: ${calendar.name}`);
+
+              installConflictGuard(calendar);
               
               try {
                 // Use getItemsAsArray - simple and works!
@@ -355,23 +420,46 @@ var calendarCategories = class extends ExtensionCommon.ExtensionAPI {
                       if (force || !currentCategories.includes(rule.category)) {
                         console.log(`    "${title}" → ${rule.category}${force ? ' (forced)' : ''}`);
                         
-                        const newItem = item.clone();
+                        // Re-read the event right before saving: a sync during the scan
+                        // may have brought a newer version (e.g. category already set by
+                        // another computer, or other changes we must not overwrite)
+                        let base = item;
+                        if (item.parentItem == item) {
+                          const fresh = await calendar.getItem(item.id);
+                          if (!fresh || !(fresh.title || "").toLowerCase().includes(rule.keyword.toLowerCase())) {
+                            break;
+                          }
+                          if (!force && fresh.getCategories().includes(rule.category)) {
+                            break;
+                          }
+                          base = fresh;
+                        }
+
+                        const newItem = base.clone();
                         
                         // In force mode, replace all categories. Normal: add to existing
                         if (force) {
                           newItem.setCategories([rule.category]);
                         } else {
-                          newItem.setCategories([...currentCategories, rule.category]);
+                          newItem.setCategories([...base.getCategories(), rule.category]);
                         }
                         
-                        await calendar.modifyItem(newItem, item);
-                        
-                        lastStats.modified++;
-                        lastStats.details.push({
-                          title: title,
-                          category: rule.category,
-                          calendar: calendar.name
-                        });
+                        const conflictsBefore = lastStats.conflicts;
+                        pendingAutoWrites.add(item.id);
+                        try {
+                          await calendar.modifyItem(newItem, base);
+                        } finally {
+                          pendingAutoWrites.delete(item.id);
+                        }
+
+                        if (lastStats.conflicts == conflictsBefore) {
+                          lastStats.modified++;
+                          lastStats.details.push({
+                            title: title,
+                            category: rule.category,
+                            calendar: calendar.name
+                          });
+                        }
                       }
                       break; // First rule wins
                     }
@@ -383,7 +471,7 @@ var calendarCategories = class extends ExtensionCommon.ExtensionAPI {
               }
             }
             
-            console.log(`Calendar Auto Categories: Done. ${lastStats.processed} processed, ${lastStats.modified} modified.`);
+            console.log(`Calendar Auto Categories: Done. ${lastStats.processed} processed, ${lastStats.modified} modified, ${lastStats.conflicts} skipped (changed on server).`);
             return lastStats;
             
           } catch (error) {

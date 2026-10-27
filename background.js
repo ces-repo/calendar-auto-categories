@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
   daysBack: 1,
   daysForward: 90,
   intervalMinutes: 10,
-  fullWidthColors: true,
+  fullWidthColors: true,  // Show category colors as full background
 };
 
 // Current configuration
@@ -145,38 +145,36 @@ function setupInterval() {
 /**
  * Handle messages from options page
  */
-browser.runtime.onMessage.addListener(async (message, sender) => {
+browser.runtime.onMessage.addListener((message, sender) => {
   console.log("Calendar Auto Categories: Received message:", message.action);
-  
-  switch (message.action) {
-    case "configUpdated":
-      // Reload config and restart interval
-      await loadConfig();
-      await ensureCategories();
-      await applyStyles();
-      setupInterval();
-      return { success: true };
-      
-    case "scanNow":
-      // Run immediate scan
-      await ensureCategories();
-      const stats = await applyCategories(false);
-      return { success: true, stats };
-      
-    case "forceScan":
-      // Run forced scan (re-apply all categories)
-      await ensureCategories();
-      const forceStats = await applyCategories(true);
-      return { success: true, stats: forceStats };
-    
-    case "resetCategories":
-      // Remove all addon-created categories
-      const removed = await browser.calendarCategories.removeCategories(message.categoryNames);
-      return { success: true, removed };
-      
-    default:
-      return { success: false, error: "Unknown action" };
-  }
+
+  return (async () => {
+    switch (message.action) {
+      case "configUpdated":
+        await loadConfig();
+        await ensureCategories();
+        await applyStyles();
+        setupInterval();
+        return { success: true };
+
+      case "scanNow":
+        await ensureCategories();
+        return { success: true, stats: await applyCategories(false) };
+
+      case "forceScan":
+        await ensureCategories();
+        return { success: true, stats: await applyCategories(true) };
+
+      case "resetCategories":
+        return {
+          success: true,
+          removed: await browser.calendarCategories.removeCategories(message.categoryNames),
+        };
+
+      default:
+        return { success: false, error: "Unknown action" };
+    }
+  })();
 });
 
 /**

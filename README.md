@@ -113,6 +113,16 @@ This project is licensed under the Mozilla Public License 2.0 - see the [LICENSE
 
 ## 📋 Changelog
 
+### v1.5.8
+- ✅ Compatible again with Thunderbird 142+ (strict_max_version raised to 158; 1.5.6/1.5.7 were limited to 141)
+- 🔄 Shared CalDAV calendars: if an event was changed on the server in the meantime (e.g. by another computer), the add-on keeps the server version silently instead of showing the "item was modified on the server" dialog. The category is added on the next scan if still missing.
+- 🛡️ Events are re-read right before saving, so changes made by others are no longer overwritten
+- 📊 Scan result shows how many events were skipped because they changed on the server
+
+### v1.5.3 – v1.5.7
+- Use `cal.manager` for calendar access
+- Options page message handling fix
+
 ### v1.5.0
 - ✅ Thunderbird 147+ support (strict_max_version raised to 160)
 - 🔄 Changed default categories to universal examples
