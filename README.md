@@ -113,6 +113,9 @@ This project is licensed under the Mozilla Public License 2.0 - see the [LICENSE
 
 ## 📋 Changelog
 
+### v1.5.9
+- Compatible with Thunderbird 159
+
 ### v1.5.8
 - ✅ Compatible again with Thunderbird 142+ (strict_max_version raised to 158; 1.5.6/1.5.7 were limited to 141)
 - 🔄 Shared CalDAV calendars: if an event was changed on the server in the meantime (e.g. by another computer), the add-on keeps the server version silently instead of showing the "item was modified on the server" dialog. The category is added on the next scan if still missing.
