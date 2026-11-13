@@ -113,6 +113,9 @@ This project is licensed under the Mozilla Public License 2.0 - see the [LICENSE
 
 ## 📋 Changelog
 
+### v1.5.11
+- Compatible with Thunderbird 160
+
 ### v1.5.9
 - Compatible with Thunderbird 159
 
